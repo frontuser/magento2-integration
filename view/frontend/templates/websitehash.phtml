@@ -1,0 +1,47 @@
+<?php
+
+\Magento\Framework\Profiler::start('FRONTUSER');
+
+if($this->isEnable()) {
+
+	$matrix_data = array();
+	if($this->isMatrixEnable()) {
+
+		$name = $this->getLayout()->getBlock( 'page.main.title' )->getPageTitle();
+		if ( is_object( $name ) ) {
+			$name = $name->getText();
+		}
+
+		$matrix_data['page'] = array(
+			'name' => $name,
+			'type' => $this->getType(),
+			'url'  => $this->getUrl( '*/*/*', [ '_current' => true, '_use_rewrite' => true ] )
+		);
+
+		$matrix_data = $this->getMatrixData($matrix_data);
+	}
+?>
+
+    <script type="text/javascript">
+        (function(p,u,s,h) {
+            var t='<?php echo $this->isWebHash(); ?>';
+            p._fq=p._fq||[];
+            p._fq.push(['_currentTime',Date.now()]);
+            s=u.createElement('script');
+            s.type='text/javascript';
+            s.async=true;
+            s.src='https://cdn.frontuser.com/sdk/1.0/fuser-'+t+'.js',
+                h=u.getElementsByTagName('script')[0];
+            h.parentNode.insertBefore(s,h);
+        })(window,document);
+
+        <?php if($this->isMatrixEnable()) { ?>
+            window.fu_matrix = <?php echo $matrix_data; ?>;
+        <?php } ?>
+    </script>
+
+<?php
+    }
+    \Magento\Framework\Profiler::stop('FRONTUSER');
+
+?>
