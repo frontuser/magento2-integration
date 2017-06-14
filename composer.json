@@ -2,6 +2,7 @@
   "name": "frontuser/magento2-integration",
   "description": "A Magento 2 modules for Frontuser. Frontuser is a easiest platform to maximize user engagement, retention & conversion.",
   "type": "magento2-module",
+"version":"v1.0.0",
   "license": [
     "GPL-3.0",
     "AFL-3.0"
