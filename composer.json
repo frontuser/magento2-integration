@@ -1,6 +1,6 @@
 {
   "name": "frontuser/magento2-integration",
-  "description": "Frontuser is a easiest platform to maximize user engagement, retention & conversion. We're in private beta, please subscribe for early access.",
+  "description": "Frontuser is a easiest platform to maximize user engagement, retention & conversion.",
   "version": "1.0.0",
   "type": "magento2-module",
   "license": [
@@ -18,7 +18,7 @@
   "repositories": {
     "frontuser": {
         "type": "vcs",
-        "url": "https://github.com/jayesh-patel/"
+        "url": "https://github.com/frontuser/"
     }
   }
 }
