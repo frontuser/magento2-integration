@@ -1,12 +1,22 @@
 {
   "name": "frontuser/magento2-integration",
-  "description": "Frontuser is a easiest platform to maximize user engagement, retention & conversion.",
+  "description": "A Magento 2 modules for Frontuser. Frontuser is a easiest platform to maximize user engagement, retention & conversion.",
   "version": "1.0.0",
   "type": "magento2-module",
   "license": [
     "GPL-3.0",
     "AFL-3.0"
   ],
+"authors": [
+        {
+            "name": "Frontuser",
+            "email": "support@frontuser.com",
+            "homepage": "https://frontuser.com/"
+        }
+    ],
+"require": {
+        "php": "~5.6.0|~7.0.0",
+    },
   "autoload": {
     "files": [
       "registration.php"
