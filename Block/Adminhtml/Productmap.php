@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Frontuser Integration
+ * Copyright © 2017 Frontuser. All rights reserved.
+ *
+ * @category    Frontuser
+ * @package     Frontuser_Integration
+ * @author      Frontuser Team <support@frontuser.com>
+ * @copyright   Frontuser (https://frontuser.com)
+ * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
 namespace Frontuser\Integration\Block\Adminhtml;
 
 class Productmap extends \Magento\Config\Block\System\Config\Form\Field\FieldArray\AbstractFieldArray
@@ -9,11 +20,15 @@ class Productmap extends \Magento\Config\Block\System\Config\Form\Field\FieldArr
 	 */
 	protected $_elementFactory;
 
-
 	/**
 	 * @var $_attributesRenderer \Frontuser\Integration\Block\Adminhtml\Form\Field\Activation
 	 */
 	protected $_activation;
+
+	/**
+	 * @var \Magento\Catalog\Model\Product
+	 */
+	protected $productModel;
 
 	/**
 	 * @param \Magento\Backend\Block\Template\Context $context
@@ -23,10 +38,12 @@ class Productmap extends \Magento\Config\Block\System\Config\Form\Field\FieldArr
 	public function __construct(
 		\Magento\Backend\Block\Template\Context $context,
 		\Magento\Framework\Data\Form\Element\Factory $elementFactory,
+		\Magento\Catalog\Model\Product $productModel,
 		array $data = []
 	)
 	{
 		$this->_elementFactory  = $elementFactory;
+		$this->productModel = $productModel;
 		parent::__construct($context,$data);
 	}
 
@@ -45,9 +62,7 @@ class Productmap extends \Magento\Config\Block\System\Config\Form\Field\FieldArr
 				['data' => ['is_render_to_js_template' => true]]
 			);
 
-			$objectManager =  \Magento\Framework\App\ObjectManager::getInstance();
-			$attributes = $objectManager->get('Magento\Catalog\Model\Product')->getAttributes();
-
+			$attributes = $this->productModel->getAttributes();
 			$attributesArrays = array();
 			foreach($attributes as $attribute) {
 				$attributesArrays[] = array(

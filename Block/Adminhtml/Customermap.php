@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Frontuser Integration
+ * Copyright © 2017 Frontuser. All rights reserved.
+ *
+ * @category    Frontuser
+ * @package     Frontuser_Integration
+ * @author      Frontuser Team <support@frontuser.com>
+ * @copyright   Frontuser (https://frontuser.com)
+ * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
+
 namespace Frontuser\Integration\Block\Adminhtml;
 
 
@@ -10,11 +21,15 @@ class Customermap extends \Magento\Config\Block\System\Config\Form\Field\FieldAr
 	 */
 	protected $_elementFactory;
 
-
 	/**
 	 * @var $_attributesRenderer \Frontuser\Integration\Block\Adminhtml\Form\Field\Activation
 	 */
 	protected $_activation;
+
+	/**
+	 * @var \Magento\Customer\Model\Customer
+	 */
+	protected $customerModel;
 
 	/**
 	 * @param \Magento\Backend\Block\Template\Context $context
@@ -24,10 +39,12 @@ class Customermap extends \Magento\Config\Block\System\Config\Form\Field\FieldAr
 	public function __construct(
 		\Magento\Backend\Block\Template\Context $context,
 		\Magento\Framework\Data\Form\Element\Factory $elementFactory,
+		\Magento\Customer\Model\Customer $customerModel,
 		array $data = []
 	)
 	{
 		$this->_elementFactory  = $elementFactory;
+		$this->customerModel = $customerModel;
 		parent::__construct($context,$data);
 	}
 
@@ -46,9 +63,7 @@ class Customermap extends \Magento\Config\Block\System\Config\Form\Field\FieldAr
 				['data' => ['is_render_to_js_template' => true]]
 			);
 
-			$objectManager =  \Magento\Framework\App\ObjectManager::getInstance();
-			$attributes = $objectManager->get('Magento\Customer\Model\Customer')->getAttributes();
-
+			$attributes = $this->customerModel->getAttributes();
 			$attributesArrays = array();
 			foreach($attributes as $attribute) {
 				$attributesArrays[] = array(
