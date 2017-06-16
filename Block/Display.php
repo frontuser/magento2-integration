@@ -319,20 +319,20 @@ class Display extends \Magento\Framework\View\Element\Template
 	 * @return array
 	 */
 	private function getReferrerDetail()
-	{
-		$_Referrer = array(
-			'host' => $_SERVER['HTTP_HOST'],
-			'path' => $_SERVER['DOCUMENT_ROOT'],
-			'search' => $_SERVER['QUERY_STRING'],
-			'utm' => array(
-				'medium' => !empty($_REQUEST['medium'])?$_REQUEST['medium']:'',
-				'source' => !empty($_REQUEST['source'])?$_REQUEST['source']:'',
-				'campaign' => !empty($_REQUEST['campaign'])?$_REQUEST['campaign']:'',
-			)
-		);
+    {
+        $_Referrer = array(
+            'host' => $this->_request->getServer('HTTP_HOST'),
+            'path' => $this->_request->getServer('DOCUMENT_ROOT'),
+            'search' => $this->_request->getServer('QUERY_STRING'),
+            'utm' => array(
+                'medium' => $this->_request->getParam('medium'),
+                'source' => $this->_request->getParam('source'),
+                'campaign' => $this->_request->getParam('campaign'),
+            )
+        );
 
-		return $_Referrer;
-	}
+        return $_Referrer;
+    }
 
 
 	/**
