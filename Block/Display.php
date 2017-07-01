@@ -73,6 +73,11 @@ class Display extends \Magento\Framework\View\Element\Template
 	private $category;
 
 	/**
+	 * @var Page Title
+	 */
+	private $_pageTitle;
+
+	/**
 	 * Recipient frontuser config path
 	 */
 	const XML_PATH_FRONTUSER_WEBHASH = 'frontuser_section/general/frontuser_webhash';
@@ -98,6 +103,7 @@ class Display extends \Magento\Framework\View\Element\Template
 		\Magento\Checkout\Model\Cart $cartModel,
 		\Magento\Sales\Model\Order $orderModel,
 		\Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
+        \Magento\Framework\View\Page\Title $pageTitle,
 		array $data = []
 	)
 	{
@@ -110,6 +116,7 @@ class Display extends \Magento\Framework\View\Element\Template
 		$this->reviewModel = $reviewModel;
 		$this->cartModel = $cartModel;
 		$this->orderModel = $orderModel;
+        $this->_pageTitle = $pageTitle;
 
 		parent::__construct($context, $data);
 	}
@@ -121,7 +128,7 @@ class Display extends \Magento\Framework\View\Element\Template
 	{
 		$status = $this->_scopeConfig->getValue(self::XML_PATH_FRONTUSER_ENABLE);
 		if(!empty( $status) && $status == 1) {
-			if(!$this->isWebHash()) {
+			if(!$this->getWebHash()) {
 				return false;
 			}
 			return true;
@@ -144,7 +151,7 @@ class Display extends \Magento\Framework\View\Element\Template
 	/**
 	 * @return bool
 	 */
-	public function isWebHash()
+	public function getWebHash()
 	{
 		$webhash = $this->_scopeConfig->getValue(self::XML_PATH_FRONTUSER_WEBHASH);
 		if(!empty( $webhash )) {
@@ -286,6 +293,21 @@ class Display extends \Magento\Framework\View\Element\Template
 		return $this->category;
 	}
 
+    /**
+     * @return Page Title
+     */
+    public function getPageTitle()
+    {
+        if($pageBlock = $this->getLayout()->getBlock( 'page.main.title' )){
+            $name = $pageBlock->getPageTitle();
+            if ( is_object( $name ) ) {
+                $name = $name->getText();
+            }
+            return $name;
+        }
+        return $this->_pageTitle->getShort();
+    }
+
 	/**
 	 * @return array
 	 */
@@ -322,7 +344,7 @@ class Display extends \Magento\Framework\View\Element\Template
     {
         $_Referrer = array(
             'host' => $this->_request->getServer('HTTP_HOST'),
-            'path' => $this->_request->getServer('DOCUMENT_ROOT'),
+            'path' => $this->_request->getServer('REQUEST_URI'),
             'search' => $this->_request->getServer('QUERY_STRING'),
             'utm' => array(
                 'medium' => $this->_request->getParam('medium'),
@@ -634,13 +656,12 @@ class Display extends \Magento\Framework\View\Element\Template
 			unset( $_Data );
 		}
 
-		if($this->isCart()) {
-			$_Data = $this->getCartDetail();
-			if(!empty( $_Data )) {
-				$_MatrixData['cart'] = $_Data;
-			}
-			unset( $_Data );
-		}
+        if($_Data = $this->getCartDetail()) {
+            if(!empty( $_Data ) && $_Data["items_qty"] > 0) {
+                $_MatrixData['cart'] = $_Data;
+            }
+            unset( $_Data );
+        }
 
 		if($this->isSuccess()) {
 			$_Data = $this->getOrderDetail();
