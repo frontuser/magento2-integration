@@ -1,30 +1,37 @@
 <?php
+/**
+ * Frontuser Integration
+ * Copyright © 2017 Frontuser. All rights reserved.
+ *
+ * @category    Frontuser
+ * @package     Frontuser_Integration
+ * @author      Frontuser Team <support@frontuser.com>
+ * @copyright   Frontuser (https://frontuser.com)
+ * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ */
 
 \Magento\Framework\Profiler::start('FRONTUSER');
 
 if($this->isEnable()) {
 
-	$matrix_data = array();
-	if($this->isMatrixEnable()) {
+    $matrix_data = array();
+    if($this->isMatrixEnable()) {
 
-		$name = $this->getLayout()->getBlock( 'page.main.title' )->getPageTitle();
-		if ( is_object( $name ) ) {
-			$name = $name->getText();
-		}
+        $name = $this->getPageTitle();
 
-		$matrix_data['page'] = array(
-			'name' => $name,
-			'type' => $this->getType(),
-			'url'  => $this->getUrl( '*/*/*', [ '_current' => true, '_use_rewrite' => true ] )
-		);
+        $matrix_data['page'] = array(
+            'name' => $name,
+            'type' => $this->getType(),
+            'url'  => $this->getUrl( '*/*/*', [ '_current' => true, '_use_rewrite' => true ] )
+        );
 
-		$matrix_data = $this->getMatrixData($matrix_data);
-	}
-?>
+        $matrix_data = $this->getMatrixData($matrix_data);
+    }
+    ?>
 
     <script type="text/javascript">
         (function(p,u,s,h) {
-            var t='<?php echo $this->isWebHash(); ?>';
+            var t='<?php echo $this->getWebHash(); ?>';
             p._fq=p._fq||[];
             p._fq.push(['_currentTime',Date.now()]);
             s=u.createElement('script');
@@ -36,12 +43,12 @@ if($this->isEnable()) {
         })(window,document);
 
         <?php if($this->isMatrixEnable()) { ?>
-            window.fu_matrix = <?php echo $matrix_data; ?>;
+        window.fu_matrix = <?php echo $matrix_data; ?>;
         <?php } ?>
     </script>
 
-<?php
-    }
-    \Magento\Framework\Profiler::stop('FRONTUSER');
+    <?php
+}
+\Magento\Framework\Profiler::stop('FRONTUSER');
 
 ?>
