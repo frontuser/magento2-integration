@@ -91,6 +91,13 @@ class Display extends \Magento\Framework\View\Element\Template
 	 *
 	 * @param \Magento\Framework\View\Element\Template\Context $context
 	 * @param \Magento\Framework\Registry $registry
+	 * @param \Magento\Customer\Model\Session $customerSession,
+	 * @param \Magento\Checkout\Model\Session $checkoutSession,
+	 * @param \Magento\Catalog\Model\Product $productModel,
+	 * @param \Magento\Review\Model\Review $reviewModel,
+	 * @param \Magento\Checkout\Model\Cart $cartModel,
+	 * @param \Magento\Sales\Model\Order $orderModel,
+	 * @param \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
 	 * @param array $data
 	 */
 	public function __construct(
@@ -116,7 +123,7 @@ class Display extends \Magento\Framework\View\Element\Template
 		$this->reviewModel = $reviewModel;
 		$this->cartModel = $cartModel;
 		$this->orderModel = $orderModel;
-        $this->_pageTitle = $pageTitle;
+        	$this->_pageTitle = $pageTitle;
 
 		parent::__construct($context, $data);
 	}
@@ -656,12 +663,14 @@ class Display extends \Magento\Framework\View\Element\Template
 			unset( $_Data );
 		}
 
-        if($_Data = $this->getCartDetail()) {
-            if(!empty( $_Data ) && $_Data["items_qty"] > 0) {
-                $_MatrixData['cart'] = $_Data;
-            }
-            unset( $_Data );
-        }
+		if ($this->isCart()) {
+			if($_Data = $this->getCartDetail()) {
+				if(!empty( $_Data ) && $_Data["items_qty"] > 0) {
+					$_MatrixData['cart'] = $_Data;
+				}
+				unset( $_Data );
+			}
+		}
 
 		if($this->isSuccess()) {
 			$_Data = $this->getOrderDetail();
@@ -674,5 +683,54 @@ class Display extends \Magento\Framework\View\Element\Template
 		$_MatrixData = json_encode( array_filter( $_MatrixData ));
 
 		return $_MatrixData;
+	}
+
+	/**
+	 * Get total order amount
+	 *
+	 * @return string
+	 */
+	public function getRevenue()
+	{
+		$revenue = 0;
+
+		$orderid = $this->checkoutSession->getLastOrderId();
+		if ($orderid) {
+			$order   = $this->orderModel->load( $orderid );
+			$revenue = $order->getGrandTotal();
+		}
+
+		return number_format($revenue, 2, '.', '');
+	}
+
+	/**
+	 * Get store currency code
+	 *
+	 * @return string
+	 */
+	public function getCurrency()
+	{
+		return $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
+	}
+
+
+	public function encrypt_decrypt($action, $string)
+	{
+		$output = false;
+		$encrypt_method = "AES-256-CBC";
+		$secret_key = '!@#$%^&*';
+		$secret_iv = 'frontuser';
+		// hash
+		$key = hash('sha256', $secret_key);
+
+		// iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
+		$iv = substr(hash('sha256', $secret_iv), 0, 16);
+		if ( $action == 'encrypt' ) {
+			$output = openssl_encrypt($string, $encrypt_method, $key, 0, $iv);
+			$output = base64_encode($output);
+		} else if( $action == 'decrypt' ) {
+			$output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
+		}
+		return $output;
 	}
 }

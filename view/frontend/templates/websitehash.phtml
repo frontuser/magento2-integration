@@ -43,11 +43,21 @@ if($this->isEnable()) {
         })(window,document);
 
         <?php if($this->isMatrixEnable()) { ?>
-        window.fu_matrix = <?php echo $matrix_data; ?>;
+            window.fu_matrix = <?php echo $matrix_data; ?>;
+        <?php } ?>
+
+        <?php if($this->isSuccess()) { ?>
+            var TrackRevenue = function() {
+                return {
+                    amount: '<?php echo $this->getRevenue(); ?>',
+                    currency: '<?php echo $this->getCurrency(); ?>'
+                };
+            };
         <?php } ?>
     </script>
 
-    <?php
+<?php
+
 }
 \Magento\Framework\Profiler::stop('FRONTUSER');
 
