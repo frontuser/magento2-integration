@@ -194,7 +194,7 @@ class Display extends \Magento\Framework\View\Element\Template
 	/**
 	 * @return bool
 	 */
-	private function isHomepage()
+	public function isHomepage()
 	{
 		if ($this->_request->getFullActionName() == 'cms_index_index') {
 			return true;
@@ -205,7 +205,7 @@ class Display extends \Magento\Framework\View\Element\Template
 	/**
 	 * @return bool
 	 */
-	private function isProduct()
+	public function isProduct()
 	{
 		if ($this->_request->getFullActionName() == 'catalog_product_view') {
 			return true;
@@ -216,7 +216,7 @@ class Display extends \Magento\Framework\View\Element\Template
 	/**
 	 * @return bool
 	 */
-	private function isCategory()
+	public function isCategory()
 	{
 		if ($this->_request->getFullActionName() == 'catalog_category_view') {
 			return true;
@@ -227,7 +227,7 @@ class Display extends \Magento\Framework\View\Element\Template
 	/**
 	 * @return bool
 	 */
-	private function isCart()
+	public function isCart()
 	{
 		if ($this->_request->getFullActionName() == 'checkout_cart_index') {
 			return true;
@@ -238,7 +238,7 @@ class Display extends \Magento\Framework\View\Element\Template
 	/**
 	 * @return bool
 	 */
-	private function isSuccess()
+	public function isSuccess()
 	{
 		if ($this->_request->getFullActionName() == 'checkout_onepage_success') {
 			return true;
@@ -377,10 +377,10 @@ class Display extends \Magento\Framework\View\Element\Template
 			"name"          => $this->getProduct()->getName(),
 			"description"   => $this->getProduct()->getDescription(),
 			"cat_id"        => $this->getProduct()->getCategoryIds(),
-			"stock"         => $StockState->getQty(),
+			"stock"         => (int)$StockState->getQty(),
 			"currency"      => $this->_storeManager->getStore()->getCurrentCurrency()->getCode(),
-			"unit_price"    => $this->getProduct()->getPrice(),
-			"final_price"   => $this->getProduct()->getFinalPrice(),
+			"unit_price"    => $this->formatPrice($this->getProduct()->getPrice()),
+			"final_price"   => $this->formatPrice($this->getProduct()->getFinalPrice()),
 		);
 
 		//TOOD: Add custom attributes to product object
@@ -388,7 +388,11 @@ class Display extends \Magento\Framework\View\Element\Template
 		if(!empty( $attributes)) {
 			foreach ($attributes as $attribute) {
 				if(!empty( $attribute['field']) && !empty( $attribute['value'])) {
-					$_ProductData[ 'field' ] = $this->getProduct()->getData( $attribute['value'] );
+					$_value = $this->getProduct()->getData( $attribute['value'] );
+					if(is_float( $_value)) {
+						$_value = $this->formatPrice($_value);
+					}
+					$_ProductData[ $attribute['field'] ] = $_value;
 				}
 			}
 		}
@@ -405,10 +409,10 @@ class Display extends \Magento\Framework\View\Element\Template
 					"pid" => $product->getId(),
 					"sku" => $product->getSku(),
 					"name" => $product->getName(),
-					"stock" => $StockState->getQty(),
+					"stock" => (int)$StockState->getQty(),
 					"currency" => $this->_storeManager->getStore()->getCurrentCurrency()->getCode(),
-					"unit_price" => $product->getPrice(),
-					"final_price" => $product->getFinalPrice(),
+					"unit_price" => $this->formatPrice($product->getPrice()),
+					"final_price" => $this->formatPrice($product->getFinalPrice()),
 				);
 				unset( $product ); unset( $StockState );
 			}
@@ -483,10 +487,10 @@ class Display extends \Magento\Framework\View\Element\Template
 				"pid"         => $product->getId(),
 				"sku"         => $product->getSku(),
 				"name"        => $product->getName(),
-				"stock"       => $StockState->getQty(),
+				"stock"       => (int)$StockState->getQty(),
 				"currency"    => $this->_storeManager->getStore()->getCurrentCurrency()->getCode(),
-				"unit_price"  => $product->getPrice(),
-				"final_price" => $product->getFinalPrice(),
+				"unit_price"  => $this->formatPrice($product->getPrice()),
+				"final_price" => $this->formatPrice($product->getFinalPrice()),
 			);
 			$_CategoryData['listing']['items_count'] += 1;
 			unset( $StockState );
@@ -508,17 +512,17 @@ class Display extends \Magento\Framework\View\Element\Template
 
 			$_CartData = array(
 				"quote_id"        => $cart->getId(),
-				"items_qty"       => $cart->getItemsQty(),
+				"items_qty"       => (int)$cart->getItemsQty(),
 				"currency"        => $this->_storeManager->getStore()->getCurrentCurrency()->getCode(),
-				"subtotal"        => $cart->getSubtotal(),
-				"tax_amount"      => $cart->getTaxAmount(),
+				"subtotal"        => $this->formatPrice($cart->getSubtotal()),
+				"tax_amount"      => $this->formatPrice($cart->getTaxAmount()),
 				"shipping_method" => '',
-				"shipping_amount" => $cart->getShippingAmount(),
+				"shipping_amount" => $this->formatPrice($cart->getShippingAmount()),
 				"coupon_code"     => $cart->getCouponCode(),
-				"discount_amount" => $cart->getSubtotal() - $cart->getSubtotalWithDiscount(),
+				"discount_amount" => $this->formatPrice($cart->getSubtotal() - $cart->getSubtotalWithDiscount()),
 				"created_on"      => $cart->getCreatedAt(),
 				"updated_on"      => $cart->getUpdatedAt(),
-				"grand_total"     => $cart->getGrandTotal()
+				"grand_total"     => $this->formatPrice($cart->getGrandTotal())
 			);
 
 			$items = $cart->getItemsCollection()->getItems();
@@ -532,11 +536,11 @@ class Display extends \Magento\Framework\View\Element\Template
 					"sku"         => $product->getSku(),
 					"name"        => $product->getName(),
 					"currency"    => $this->_storeManager->getStore()->getCurrentCurrency()->getCode(),
-					"unit_price"  => $product->getPrice(),
-					"final_price" => $product->getPrice(),
-					"qty_added"   => $product->getRowTotal(),
-					"row_total"   => $product->getQty(),
-					"discount_amount" => $product->getDiscountAmount(),
+					"unit_price"  => $this->formatPrice($product->getPrice()),
+					"final_price" => $this->formatPrice($product->getPrice()),
+					"qty_added"   => (int)$product->getQty(),
+					"row_total"   => $this->formatPrice($product->getRowTotal()),
+					"discount_amount" => $this->formatPrice($product->getDiscountAmount()),
 					"created_on"      => $product->getCreatedAt(),
 					"updated_on"      => $product->getUpdatedAt()
 				);
@@ -563,16 +567,16 @@ class Display extends \Magento\Framework\View\Element\Template
 			$order = $this->orderModel->load( $orderid );
 			$_OrderData = array(
 				"order_id" => $order->getId(),
-			    "items_qty" => $order->getTotalItemCount(),
+			    "items_qty" => (int)$order->getTotalItemCount(),
 			    "currency" => $order->getOrderCurrencyCode(),
-			    "subtotal" => $order->getSubtotal(),
-			    "tax_amount" => $order->getTaxAmount(),
+			    "subtotal" => $this->formatPrice($order->getSubtotal()),
+			    "tax_amount" => $this->formatPrice($order->getTaxAmount()),
 			    "shipping_method" => $order->getShippingMethod(),
-			    "shipping_amount" => $order->getShippingAmount(),
+			    "shipping_amount" => $this->formatPrice($order->getShippingAmount()),
 			    "payment_method" => "",
 			    "coupon_code" => $order->getCouponCode(),
-			    "discount_amount" => $order->getDiscountAmount(),
-			    "grand_total" => $order->getGrandTotal(),
+			    "discount_amount" => $this->formatPrice($order->getDiscountAmount()),
+			    "grand_total" => $this->formatPrice($order->getGrandTotal()),
 				"created_on" => $order->getCreatedAt(),
 				"updated_on" => $order->getUpdatedAt()
 			);
@@ -611,12 +615,12 @@ class Display extends \Magento\Framework\View\Element\Template
 			            "sku" => $item->getSku(),
 			            "name" => $item->getName(),
 			            "currency" => $order->getOrderCurrencyCode(),
-						"unit_price"  => $item->getPrice(),
-						"final_price" => $item->getPrice(),
-			            "order_qty" => $item->getQtyOrdered(),
-			            "row_total" => $item->getRowTotal(),
-			            "tax_amount" => $item->getTaxAmount(),
-			            "discount_amount" => $item->getDiscountAmount(),
+						"unit_price"  => $this->formatPrice($item->getPrice()),
+						"final_price" => $this->formatPrice($item->getPrice()),
+			            "order_qty" => (int)$item->getQtyOrdered(),
+			            "row_total" => $this->formatPrice($item->getRowTotal()),
+			            "tax_amount" => $this->formatPrice($item->getTaxAmount()),
+			            "discount_amount" => $this->formatPrice($item->getDiscountAmount()),
 						"created_on" => $item->getCreatedAt(),
 						"updated_on" => $item->getUpdatedAt()
 					);
@@ -713,24 +717,14 @@ class Display extends \Magento\Framework\View\Element\Template
 		return $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
 	}
 
-
-	public function encrypt_decrypt($action, $string)
+	/**
+	 * Format price into 2 decimal point value
+	 *
+	 * @param int $price
+	 * @return float
+	 */
+	public function formatPrice($price = 0)
 	{
-		$output = false;
-		$encrypt_method = "AES-256-CBC";
-		$secret_key = '!@#$%^&*';
-		$secret_iv = 'frontuser';
-		// hash
-		$key = hash('sha256', $secret_key);
-
-		// iv - encrypt method AES-256-CBC expects 16 bytes - else you will get a warning
-		$iv = substr(hash('sha256', $secret_iv), 0, 16);
-		if ( $action == 'encrypt' ) {
-			$output = openssl_encrypt($string, $encrypt_method, $key, 0, $iv);
-			$output = base64_encode($output);
-		} else if( $action == 'decrypt' ) {
-			$output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
-		}
-		return $output;
+		return floatval(number_format($price, 2, '.', ''));
 	}
 }
