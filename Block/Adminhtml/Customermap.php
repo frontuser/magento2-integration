@@ -19,17 +19,17 @@ class Customermap extends \Magento\Config\Block\System\Config\Form\Field\FieldAr
 	/**
 	 * @var \Magento\Framework\Data\Form\Element\Factory
 	 */
-	protected $_elementFactory;
+	public $elementFactory;
 
 	/**
 	 * @var $_attributesRenderer \Frontuser\Integration\Block\Adminhtml\Form\Field\Activation
 	 */
-	protected $_activation;
+	public $activation;
 
 	/**
 	 * @var \Magento\Customer\Model\Customer
 	 */
-	protected $customerModel;
+	public $customerModel;
 
 	/**
 	 * @param \Magento\Backend\Block\Template\Context $context
@@ -40,24 +40,22 @@ class Customermap extends \Magento\Config\Block\System\Config\Form\Field\FieldAr
 		\Magento\Backend\Block\Template\Context $context,
 		\Magento\Framework\Data\Form\Element\Factory $elementFactory,
 		\Magento\Customer\Model\Customer $customerModel,
-		array $data = []
-	)
+		array $data = [])
 	{
-		$this->_elementFactory  = $elementFactory;
+		$this->elementFactory  = $elementFactory;
 		$this->customerModel = $customerModel;
 		parent::__construct($context,$data);
 	}
-
 
 	/**
 	 * Get activation options.
 	 *
 	 * @return \Frontuser\Integration\Block\Adminhtml\Form\Field\Activation
 	 */
-	protected function _getActivationRenderer()
+	public function _getActivationRenderer()
 	{
-		if (!$this->_activation) {
-			$this->_activation = $this->getLayout()->createBlock(
+		if (!$this->activation) {
+			$this->activation = $this->getLayout()->createBlock(
 				'\Frontuser\Integration\Block\Adminhtml\Form\Field\Activation',
 				'',
 				['data' => ['is_render_to_js_template' => true]]
@@ -65,25 +63,25 @@ class Customermap extends \Magento\Config\Block\System\Config\Form\Field\FieldAr
 
 			$attributes = $this->customerModel->getAttributes();
 			$attributesArrays = array();
-			foreach($attributes as $attribute) {
+			foreach ($attributes as $attribute) {
 				$attributesArrays[] = array(
 					'label' => $attribute->getName(),
 					'value' => $attribute->getName()
 				);
 			}
-			$this->_activation->setOptions($attributesArrays);
+
+			$this->activation->setOptions($attributesArrays);
 		}
 
-		return $this->_activation;
+		return $this->activation;
 	}
-
 
 	/**
 	 * Prepare to render.
 	 *
 	 * @return void
 	 */
-	protected function _prepareToRender()
+	public function _prepareToRender()
 	{
 		$this->addColumn('field', ['label' => __('Custom Field')]);
 
@@ -96,14 +94,13 @@ class Customermap extends \Magento\Config\Block\System\Config\Form\Field\FieldAr
 		$this->_addButtonLabel = __('Add');
 	}
 
-
 	/**
 	 * Prepare existing row data object.
 	 *
 	 * @param \Magento\Framework\DataObject $row
 	 * @return void
 	 */
-	protected function _prepareArrayRow(\Magento\Framework\DataObject $row)
+	public function _prepareArrayRow(\Magento\Framework\DataObject $row)
 	{
 		$options = [];
 		$customAttribute = $row->getData('value');

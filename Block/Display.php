@@ -522,7 +522,9 @@ class Display extends \Magento\Framework\View\Element\Template
 				"discount_amount" => $this->formatPrice($cart->getSubtotal() - $cart->getSubtotalWithDiscount()),
 				"created_on"      => $cart->getCreatedAt(),
 				"updated_on"      => $cart->getUpdatedAt(),
-				"grand_total"     => $this->formatPrice($cart->getGrandTotal())
+				"grand_total"     => $this->formatPrice($cart->getGrandTotal()),
+				"quote_token"     => $cart->getFutoken(),
+				"cart_url"        => $this->_urlBuilder->getUrl('frontuser/index/index/code/'.$cart->getFutoken())
 			);
 
 			$items = $cart->getItemsCollection()->getItems();

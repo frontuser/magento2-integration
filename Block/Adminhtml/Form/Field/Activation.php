@@ -20,7 +20,7 @@ class Activation extends \Magento\Framework\View\Element\Html\Select
 	 *
 	 * @var \Magento\Config\Model\Config\Source\Enabledisable
 	 */
-	protected $_enableDisable;
+	public $enableDisable;
 
 	/**
 	 * Activation constructor.
@@ -33,10 +33,11 @@ class Activation extends \Magento\Framework\View\Element\Html\Select
 		\Magento\Framework\View\Element\Context $context,
 		\Magento\Config\Model\Config\Source\Enabledisable $enableDisable,
 		array $data = []
-	) {
+	)
+	{
 		parent::__construct($context, $data);
 
-		$this->_enableDisable = $enableDisable;
+		$this->enableDisable = $enableDisable;
 	}
 
 	/**
@@ -56,7 +57,7 @@ class Activation extends \Magento\Framework\View\Element\Html\Select
 	public function _toHtml()
 	{
 		if (!$this->getOptions()) {
-			$attributes = $this->_enableDisable->toOptionArray();
+			$attributes = $this->enableDisable->toOptionArray();
 
 			foreach ($attributes as $attribute) {
 				$this->addOption($attribute['value'], $attribute['label']);
