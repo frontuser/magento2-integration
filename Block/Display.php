@@ -251,29 +251,55 @@ class Display extends \Magento\Framework\View\Element\Template
 	 */
 	public function getType()
 	{
-		if($this->isHomepage()) {
-			return 'home';
-		}
-		if($this->isProduct()) {
-			return 'product';
-		}
-		if($this->isCategory()) {
-			return 'category';
-		}
-		if($this->isCart()) {
-			return 'cart';
-		}
-		if($this->isSuccess()) {
-			return 'order_success';
-		}
-
-		$handler = $this->_request->getFullActionName();
+		$pagetype = $handler = $this->_request->getFullActionName();
+		
 		$handler = explode( "_", $handler);
 		if(is_array( $handler) && count( $handler) > 0) {
-			return current( $handler );
+			$pagetype = current( $handler );
 		}
 
-		return $this->_request->getFullActionName();
+		if($this->isHomepage()) {
+			$pagetype = 'home';
+		}
+		if (strpos($handler, 'catalogsearch_') === 0) {
+			$pagetype = 'search';
+		}
+		if (strpos($handler, 'customer_account_') === 0) {
+			$pagetype = 'customer account';
+		}
+		if (strpos($handler, 'customer_address_') === 0) {
+			$pagetype = 'customer address';
+		}
+		if (strpos($handler, 'wishlist_') === 0) {
+			$pagetype = 'wishlist';
+		}
+		if (strpos($handler, 'sales_') === 0) {
+			$pagetype = 'order';
+		}
+		if (strpos($handler, 'review_customer_') === 0) {
+			$pagetype = 'customer review';
+		}
+		if (strpos($handler, 'newsletter_manage_') === 0) {
+			$pagetype = 'newsletter';
+		}
+		switch ($handler) {
+			case 'catalog_category_view': $pagetype = 'category'; break;
+			case 'catalog_product_view': $pagetype = 'product'; break;
+			case 'checkout_cart_index': $pagetype = 'cart'; break;
+			case 'checkout_onepage_index': $pagetype = 'checkout'; break;
+			case 'checkout_onepage_success': $pagetype = 'success'; break;
+			case 'customer_account_login': $pagetype = 'login'; break;
+			case 'customer_account_create': $pagetype = 'register'; break;
+			case 'customer_account_logoutSuccess': $pagetype = 'logout'; break;
+			case 'customer_account_index': $pagetype = 'dashboard'; break;
+			case 'review_product_list': $pagetype = 'product review'; break;
+			case 'downloadable_customer_products': $pagetype = 'downloadable product'; break;
+			case 'catalog_seo_sitemap_category': $pagetype = 'sitemap'; break;
+			case 'contacts_index_index': $pagetype = 'contactus'; break;
+			case 'catalog_product_compare_index': $pagetype = 'compare product'; break;
+		}
+
+		return $pagetype;
 	}
 
 	/**
