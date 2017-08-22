@@ -37,7 +37,8 @@ if($this->isEnable()) {
             s=u.createElement('script');
             s.type='text/javascript';
             s.async=true;
-            s.src='https://cdn.frontuser.com/sdk/1.0/fuser-'+t+'.js',
+            var m = new Date().getTime();
+            s.src='https://cdn.frontuser.com/sdk/1.0/fuser-'+t+'.js?'+m,
                 h=u.getElementsByTagName('script')[0];
             h.parentNode.insertBefore(s,h);
         })(window,document);
