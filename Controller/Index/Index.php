@@ -46,12 +46,19 @@ class Index extends \Magento\Framework\App\Action\Action
 
 			$this->checkoutSession->setQuoteId( $quote->getId() );
 			$this->cart->setQuote( $quote );
-
-			$resultRedirect->setPath( 'checkout/cart' );
+			$redirect = 'checkout/cart/';
 
 		} else {
-			$resultRedirect->setPath( '/' );
+			$redirect = '/';
 		}
+
+		$track = $this->getRequest()->getParam('_track');
+		$campaign = $this->getRequest()->getParam('_campaign');
+		if(!empty($track) && !empty($campaign)) {
+			$redirect .= "?_track=$track&_campaign=$campaign";
+		}
+
+		$resultRedirect->setPath($redirect);
 
 		return $resultRedirect;
 	}
