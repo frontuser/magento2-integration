@@ -41,8 +41,11 @@ class Predispatch implements ObserverInterface
 	public function execute(Observer $observer)
 	{
 		$quote = $observer->getQuote();
-		$quote->setFutoken($this->random->getRandomString(32));
-
+		
+		if(!$quote->getFutoken()) {
+			$quote->setFutoken($this->random->getRandomString(32));
+		}
+		
 		return $quote;
 	}
 }
